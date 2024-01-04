@@ -26,7 +26,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "https://e-shop-api-bnt6.onrender.com", // the address that u serve in the backend 
+      "/api/": "https://e-shop-api-bnt6.onrender.com", // the address that u serve in the backend 
     },
   },
 })
