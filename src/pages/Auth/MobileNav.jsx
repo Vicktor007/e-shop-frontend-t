@@ -1,38 +1,25 @@
 import { useState } from "react";
-import {
-  AiOutlineHome,
-  AiOutlineShopping,
-  AiOutlineLogin,
-  AiOutlineUserAdd,
-  AiOutlineShoppingCart,
-} from "react-icons/ai";
+import { Link, NavLink } from "react-router-dom";
 import { FaHeart, FaTimes } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import "./Navigation.css";
-import { useSelector, useDispatch } from "react-redux";
-import { useLogoutMutation } from "../../redux/api/usersApiSlice";
-import { logout } from "../../redux/features/auth/authSlice";
-import FavoritesCount from "../Products/FavoritesCount";
+import { AiOutlineHome, AiOutlineShopping, AiOutlineShoppingCart } from "react-icons/ai";
 import { LuPackageCheck } from "react-icons/lu";
+import FavoritesCount from "../Products/FavoritesCount";
 
-const Navigation = () => {
+const MobileNav = () => {
   const { userInfo } = useSelector((state) => state.auth);
-  const { cartItems } = useSelector((state) => state.cart);
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
-  const toggleSideBar = () => {
-    setShowSidebar(!showSidebar);
-  };
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  const [logoutApiCall] = useLogoutMutation();
 
   const logoutHandler = async () => {
     try {
@@ -43,17 +30,22 @@ const Navigation = () => {
       console.error(error);
     }
   };
+//   style={({ isActive }) => ({
+//     color: isActive ? "greenyellow" : "white",
+//   })}
 
   return (
     <>
-    <button
+    {userInfo && (
+      <>
+      <button
       style={{ zIndex: 999999 }}
         className={`${
-          showSidebar ? "top-4 left-3" : "top-5 left-5"
+          isMenuOpen ? "top-4 left-5" : "top-5 left-5"
         } mobile-visible desktop-visible bg-[#151515] p-2 fixed rounded-lg `}
-        onClick={toggleSideBar}
+        onClick={toggleMenu}
       >
-        {showSidebar ? (
+        {isMenuOpen ? (
           <FaTimes color="white" />
         ) : (
           <>
@@ -63,74 +55,86 @@ const Navigation = () => {
           </>
         )}
       </button>
-    <div
-      style={{ zIndex: 9999 }}
-      className={`${
-        showSidebar ? "flex" : "hidden"
-      }   lg:flex  flex-col justify-between p-4 text-white bg-[#000] w-[5%] lg:hover:w-[15%] h-[100vh]  fixed `}
-      id="navigation-container"
-    >
-      <div className="flex flex-col justify-center space-y-4">
-        <Link
-          to="/"
-          className="flex relative"
-        >
-          <div className="flex items-center transition-transform transform hover:translate-x-2">
-          <AiOutlineHome className="mr-2 mt-[3rem]" size={26} />
-          <span className="hidden nav-item-name mt-[3rem]">HOME</span>{" "}
-          </div>
-        </Link>
 
-        <Link
-          to="/shop"
-          className="flex relative"
-        >
-          
-          <div className="flex items-center transition-transform transform hover:translate-x-2">
-          <AiOutlineShopping className="mr-2 mt-[3rem]" size={26} />
-          <span className="hidden nav-item-name mt-[3rem]">SHOP</span>{" "}
-          </div>
-        </Link>
-
-        <Link to="/cart" className="flex relative">
-          <div className="flex items-center transition-transform transform hover:translate-x-2">
-            <AiOutlineShoppingCart className="mt-[3rem] mr-2" size={26} />
-            <span className="hidden nav-item-name mt-[3rem]">Cart</span>{" "}
-          </div>
-
-          <div className="absolute top-9">
-            {cartItems.length > 0 && (
-              <span>
-                <span className="px-1 py-0 text-sm text-white bg-pink-500 rounded-full">
-                  {cartItems.reduce((a, c) => a + c.qty, 0)}
-                </span>
-              </span>
-            )}
-          </div>
-        </Link>
-
-        <Link to="/favorite" className="flex relative">
-          <div className="flex items-center transition-transform transform hover:translate-x-2">
-            <FaHeart className="mt-[3rem] mr-2" size={20} />
-            <span className="hidden nav-item-name mt-[3rem]">
-              Favorites
-            </span>{" "}
-            <FavoritesCount />
-          </div>
-        </Link>
-        {
-          userInfo && (
-            <Link to="/userOrder" className="flex relative">
-          <div className="flex items-center transition-transform transform hover:translate-x-2">
-          <LuPackageCheck className="mt-[3rem] mr-2" size={26} />
-          <span className="hidden nav-item-name mt-[3rem]">Orders</span>{" "}
-          </div>
-        </Link>
-          )
-        }
-      </div>
-
-      <div className="relative">
+      {isMenuOpen && (
+        <section style={{ zIndex: 99999 }} className="bg-[#151515] p-4 fixed left-5 top-5">
+          <ul className="list-none mt-2">
+            <li>
+              <NavLink
+              to="/"
+                className=" flex items-center py-2 px-3 "
+                style={({ isActive }) => ({
+                  color: isActive ? "greenyellow" : "white",
+                })}
+              >
+                <AiOutlineHome className="mr-2 " size={26} />
+                Home
+              </NavLink>
+            </li>
+            <li>
+            <NavLink
+            to="/shop"
+                className=" flex items-center py-2 px-3 "
+                style={({ isActive }) => ({
+                  color: isActive ? "greenyellow" : "white",
+                })}
+              >
+                <AiOutlineShopping className="mr-2 " size={26} />
+                Shop
+              </NavLink>
+            </li>
+            <li>
+            <NavLink
+            to="/cart"
+                className=" flex items-center py-2 px-3 "
+                style={({ isActive }) => ({
+                  color: isActive ? "greenyellow" : "white",
+                })}
+              >
+                <AiOutlineShoppingCart className="mr-2 " size={26} />
+                Cart
+              </NavLink>
+            </li>
+            <li>
+            <NavLink
+            to="/favorite"
+                className=" flex items-center py-2 px-3 "
+                style={({ isActive }) => ({
+                  color: isActive ? "greenyellow" : "white",
+                })}
+              >
+                <FaHeart className="mr-2 " size={26} />
+                Favorites
+                <FavoritesCount />
+              </NavLink>
+            </li>
+            {userInfo && (
+            <li>
+            <NavLink
+            to="/userOrder"
+                className=" flex items-center py-2 px-3 "
+                style={({ isActive }) => ({
+                  color: isActive ? "greenyellow" : "white",
+                })}
+              >
+                <LuPackageCheck className="mr-2 " size={26} />
+                My Orders
+              </NavLink>
+            </li>)}
+            <li>
+            <NavLink
+            to="/admin/dashboard"
+                className=" flex items-center py-2 px-3 "
+                style={({ isActive }) => ({
+                  color: isActive ? "greenyellow" : "white",
+                })}
+              >
+                <AiOutlineHome className="mr-2 " size={26} />
+                Home
+              </NavLink>
+            </li>
+          </ul>
+          <div className="relative">
         <button
           onClick={toggleDropdown}
           className="flex items-center text-gray-800 focus:outline-none"
@@ -162,8 +166,8 @@ const Navigation = () => {
 
         {dropdownOpen && userInfo && (
           <ul
-            className={`absolute right-0 bottom-5 mt-2 mr-14 space-y-2 bg-white text-gray-600 ${
-              !userInfo.isAdmin ? "-top-30" : "-top-90"
+            className={`absolute left-4 mt-5 bottom-6 mr-1 space-y-2 bg-white text-gray-600 ${
+              !userInfo.isAdmin ? "-top-30" : ".top-m bottom-15 "
             } `}
           >
             {userInfo.isAdmin && (
@@ -249,9 +253,12 @@ const Navigation = () => {
           </ul>
         )}
       </div>
-    </div>
+        </section>
+      )}
+    </>)}
+    
     </>
   );
 };
 
-export default Navigation;
+export default MobileNav;
